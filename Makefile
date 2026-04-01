@@ -31,3 +31,11 @@ train-sasrec:
 .PHONY: dvc-repro
 dvc-repro:
 	$(UV) run dvc repro
+
+.PHONY: docs
+docs:
+	$(UV) run mkdocs serve -f docs/mkdocs.yml
+
+.PHONY: docs-build
+docs-build:
+	$(UV) run mkdocs build -f docs/mkdocs.yml

@@ -1,3 +1,4 @@
 site_name: recsys-gen
 nav:
-  - Overview: README.md
+  - Overview: index.md
+  - Architecture: architecture.md
