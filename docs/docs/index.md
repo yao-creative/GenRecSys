@@ -3,16 +3,18 @@
 `recsys-gen` is organized as a small recommender-system research pipeline with three runtime surfaces:
 
 - dataset preparation via `python -m recsys_gen.training.prepare`
+- dataset acquisition and normalization via `python -m recsys_gen.training.acquire`
 - model training and offline evaluation via `python -m recsys_gen.training.train`
 - a minimal serving stub via `recsys_gen.serving.api:app`
 
 The package is intentionally layered:
 
-1. Input data is loaded from parquet and normalized into a canonical interaction schema.
-2. Temporal splits and user histories are derived from that normalized interaction table.
-3. Models consume either interaction matrices (`ItemKNN`, matrix factorization) or sequence examples (`SASRec`).
-4. Offline ranking metrics summarize recommendation quality on the validation split.
-5. MLflow records parameters, metrics, and exported artifacts.
+1. External dataset files are downloaded or manually placed into `data/external/<dataset>/`.
+2. Acquisition normalizes them into parquet interaction and item-metadata tables under `data/raw/`.
+3. Temporal splits and user histories are derived from the normalized interaction table.
+4. Models consume either interaction matrices (`ItemKNN`, matrix factorization) or sequence examples (`SASRec`).
+5. Offline ranking metrics summarize recommendation quality on the validation split.
+6. MLflow records parameters, metrics, and exported artifacts.
 
 ## Pipeline summary with maths
 
@@ -78,7 +80,7 @@ where:
 
 ## Current execution surfaces
 
-- `dvc.yaml` orchestrates `prepare_yambda`, `train_itemknn`, and `train_sasrec`
+- `dvc.yaml` orchestrates acquisition stages for MovieLens, Amazon, and Yelp plus preparation and training stages
 - `Makefile` provides convenience wrappers for training and `dvc repro`
 - `scripts/bootstrap_sample_data.py` creates a tiny parquet dataset for local smoke runs
 

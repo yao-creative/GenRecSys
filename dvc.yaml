@@ -1,4 +1,64 @@
 stages:
+  acquire_movielens25m:
+    cmd: >-
+      uv run python -m recsys_gen.training.acquire --config configs/acquire_movielens25m.yaml
+    deps:
+      - configs/acquire_movielens25m.yaml
+      - src/recsys_gen/data/acquisition.py
+      - src/recsys_gen/training/acquire.py
+      - src/recsys_gen/utils/io.py
+    outs:
+      - data/raw/movielens25m_interactions.parquet
+      - data/raw/movielens25m_items.parquet
+
+  acquire_amazon_electronics:
+    cmd: >-
+      uv run python -m recsys_gen.training.acquire --config configs/acquire_amazon_electronics.yaml
+    deps:
+      - configs/acquire_amazon_electronics.yaml
+      - src/recsys_gen/data/acquisition.py
+      - src/recsys_gen/training/acquire.py
+      - src/recsys_gen/utils/io.py
+    outs:
+      - data/raw/amazon_electronics_interactions.parquet
+      - data/raw/amazon_electronics_items.parquet
+
+  acquire_amazon_beauty:
+    cmd: >-
+      uv run python -m recsys_gen.training.acquire --config configs/acquire_amazon_beauty.yaml
+    deps:
+      - configs/acquire_amazon_beauty.yaml
+      - src/recsys_gen/data/acquisition.py
+      - src/recsys_gen/training/acquire.py
+      - src/recsys_gen/utils/io.py
+    outs:
+      - data/raw/amazon_beauty_interactions.parquet
+      - data/raw/amazon_beauty_items.parquet
+
+  acquire_amazon_sports:
+    cmd: >-
+      uv run python -m recsys_gen.training.acquire --config configs/acquire_amazon_sports.yaml
+    deps:
+      - configs/acquire_amazon_sports.yaml
+      - src/recsys_gen/data/acquisition.py
+      - src/recsys_gen/training/acquire.py
+      - src/recsys_gen/utils/io.py
+    outs:
+      - data/raw/amazon_sports_interactions.parquet
+      - data/raw/amazon_sports_items.parquet
+
+  acquire_yelp:
+    cmd: >-
+      uv run python -m recsys_gen.training.acquire --config configs/acquire_yelp.yaml
+    deps:
+      - configs/acquire_yelp.yaml
+      - src/recsys_gen/data/acquisition.py
+      - src/recsys_gen/training/acquire.py
+      - src/recsys_gen/utils/io.py
+    outs:
+      - data/raw/yelp_interactions.parquet
+      - data/raw/yelp_items.parquet
+
   prepare_yambda:
     cmd: >-
       uv run python -m recsys_gen.training.prepare --config configs/dataset_yambda.yaml
@@ -13,6 +73,86 @@ stages:
       - data/processed/yambda/validation.parquet
       - data/processed/yambda/test.parquet
       - data/processed/yambda/sequences.parquet
+
+  prepare_movielens25m:
+    cmd: >-
+      uv run python -m recsys_gen.training.prepare --config configs/dataset_movielens25m.yaml
+    deps:
+      - configs/dataset_movielens25m.yaml
+      - data/raw/movielens25m_interactions.parquet
+      - src/recsys_gen/data/dataset.py
+      - src/recsys_gen/data/schemas.py
+      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/training/prepare.py
+    outs:
+      - data/processed/movielens25m/train.parquet
+      - data/processed/movielens25m/validation.parquet
+      - data/processed/movielens25m/test.parquet
+      - data/processed/movielens25m/sequences.parquet
+
+  prepare_amazon_electronics:
+    cmd: >-
+      uv run python -m recsys_gen.training.prepare --config configs/dataset_amazon_electronics.yaml
+    deps:
+      - configs/dataset_amazon_electronics.yaml
+      - data/raw/amazon_electronics_interactions.parquet
+      - src/recsys_gen/data/dataset.py
+      - src/recsys_gen/data/schemas.py
+      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/training/prepare.py
+    outs:
+      - data/processed/amazon_electronics/train.parquet
+      - data/processed/amazon_electronics/validation.parquet
+      - data/processed/amazon_electronics/test.parquet
+      - data/processed/amazon_electronics/sequences.parquet
+
+  prepare_amazon_beauty:
+    cmd: >-
+      uv run python -m recsys_gen.training.prepare --config configs/dataset_amazon_beauty.yaml
+    deps:
+      - configs/dataset_amazon_beauty.yaml
+      - data/raw/amazon_beauty_interactions.parquet
+      - src/recsys_gen/data/dataset.py
+      - src/recsys_gen/data/schemas.py
+      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/training/prepare.py
+    outs:
+      - data/processed/amazon_beauty/train.parquet
+      - data/processed/amazon_beauty/validation.parquet
+      - data/processed/amazon_beauty/test.parquet
+      - data/processed/amazon_beauty/sequences.parquet
+
+  prepare_amazon_sports:
+    cmd: >-
+      uv run python -m recsys_gen.training.prepare --config configs/dataset_amazon_sports.yaml
+    deps:
+      - configs/dataset_amazon_sports.yaml
+      - data/raw/amazon_sports_interactions.parquet
+      - src/recsys_gen/data/dataset.py
+      - src/recsys_gen/data/schemas.py
+      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/training/prepare.py
+    outs:
+      - data/processed/amazon_sports/train.parquet
+      - data/processed/amazon_sports/validation.parquet
+      - data/processed/amazon_sports/test.parquet
+      - data/processed/amazon_sports/sequences.parquet
+
+  prepare_yelp:
+    cmd: >-
+      uv run python -m recsys_gen.training.prepare --config configs/dataset_yelp.yaml
+    deps:
+      - configs/dataset_yelp.yaml
+      - data/raw/yelp_interactions.parquet
+      - src/recsys_gen/data/dataset.py
+      - src/recsys_gen/data/schemas.py
+      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/training/prepare.py
+    outs:
+      - data/processed/yelp/train.parquet
+      - data/processed/yelp/validation.parquet
+      - data/processed/yelp/test.parquet
+      - data/processed/yelp/sequences.parquet
 
   train_itemknn:
     cmd: >-
