@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import polars as pl
 import typer
 
 from recsys_gen.data.dataset import filter_interactions, load_dataset, normalize_interactions, train_test_split_temporal
-from recsys_gen.data.sequences import build_user_sequences
+from recsys_gen.data.sequences import write_user_sequences
 from recsys_gen.utils.io import ensure_dir, load_yaml
 
 app = typer.Typer(add_completion=False)
@@ -29,15 +28,15 @@ def main(config: str = typer.Option(..., "--config")) -> None:
         validation_ratio=payload["split"]["validation_ratio"],
         test_ratio=payload["split"]["test_ratio"],
     )
-    sequences = build_user_sequences(
-        filtered,
-        max_length=payload["sequence"]["max_length"],
-        min_length=payload["sequence"]["min_length"],
-    )
     train.write_parquet(Path(output_dir) / "train.parquet")
     validation.write_parquet(Path(output_dir) / "validation.parquet")
     test.write_parquet(Path(output_dir) / "test.parquet")
-    sequences.write_parquet(Path(output_dir) / "sequences.parquet")
+    write_user_sequences(
+        filtered,
+        max_length=payload["sequence"]["max_length"],
+        min_length=payload["sequence"]["min_length"],
+        output_path=Path(output_dir) / "sequences.parquet",
+    )
 
 
 if __name__ == "__main__":

@@ -1,0 +1,14 @@
+dataset:
+  name: movielens25m
+  normalizer: movielens
+  external_dir: data/external/movielens25m
+  raw_interactions_path: data/raw/movielens25m_interactions.parquet
+  raw_items_path: data/raw/movielens25m_items.parquet
+  download:
+    mode: auto
+    urls:
+      - https://files.grouplens.org/datasets/movielens/ml-25m.zip
+  sources:
+    ratings: ml-25m/ratings.csv
+    movies: ml-25m/movies.csv
+    tags: ml-25m/tags.csv

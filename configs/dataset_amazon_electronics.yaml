@@ -1,0 +1,24 @@
+dataset:
+  name: amazon_electronics
+  interactions_path: data/raw/amazon_electronics_interactions.parquet
+  item_metadata_path: data/raw/amazon_electronics_items.parquet
+  output_dir: data/processed/amazon_electronics
+  column_map:
+    user_id: user_id
+    item_id: item_id
+    timestamp: timestamp
+    target: target
+    event_type: event_type
+  filters:
+    min_user_interactions: 5
+    min_item_interactions: 5
+  split:
+    train_ratio: 0.8
+    validation_ratio: 0.1
+    test_ratio: 0.1
+  sequence:
+    max_length: 50
+    min_length: 2
+  negative_sampling:
+    num_negatives: 50
+    seed: 7

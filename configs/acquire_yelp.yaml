@@ -1,0 +1,36 @@
+dataset:
+  name: yelp
+  normalizer: generic
+  external_dir: data/external/yelp
+  raw_interactions_path: data/raw/yelp_interactions.parquet
+  raw_items_path: data/raw/yelp_items.parquet
+  download:
+    mode: manual
+    manual_instructions: >-
+      Download the Yelp Open Dataset, extract it under data/external/yelp/, and
+      keep the filenames below.
+  sources:
+    reviews: yelp_academic_dataset_review.json
+    businesses: yelp_academic_dataset_business.json
+  normalization:
+    interactions:
+      source: reviews
+      user_id: user_id
+      item_id: business_id
+      timestamp: date
+      event_type: review
+      extra_columns:
+        - stars
+        - useful
+        - funny
+        - cool
+    items:
+      source: businesses
+      item_id: business_id
+      extra_columns:
+        name: name
+        city: city
+        state: state
+        categories: categories
+        stars: stars
+        review_count: review_count

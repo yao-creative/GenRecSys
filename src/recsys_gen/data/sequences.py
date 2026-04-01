@@ -1,10 +1,20 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Iterable
+from pathlib import Path
+from typing import Iterable, Iterator
 
 import numpy as np
 import polars as pl
+import pyarrow.parquet as pq
+
+SEQUENCE_SCHEMA = {
+    "user_id": pl.Int64,
+    "history": pl.List(pl.Int64),
+    "target_item_id": pl.Int64,
+    "target_timestamp": pl.Int64,
+}
+DEFAULT_SEQUENCE_BATCH_ROWS = 100_000
 
 
 def build_user_sequences(
@@ -13,24 +23,48 @@ def build_user_sequences(
     max_length: int,
     min_length: int = 2,
 ) -> pl.DataFrame:
-    rows: list[dict[str, object]] = []
-    for user_frame in frame.partition_by("user_id", maintain_order=True):
-        user_id = int(user_frame["user_id"][0])
-        item_ids = user_frame["item_id"].to_list()
-        timestamps = user_frame["timestamp"].to_list()
-        for index in range(1, len(item_ids)):
-            history = item_ids[max(0, index - max_length):index]
-            if len(history) < min_length:
-                continue
-            rows.append(
-                {
-                    "user_id": user_id,
-                    "history": history,
-                    "target_item_id": int(item_ids[index]),
-                    "target_timestamp": int(timestamps[index]),
-                }
-            )
-    return pl.DataFrame(rows, schema={"user_id": pl.Int64, "history": pl.List(pl.Int64), "target_item_id": pl.Int64, "target_timestamp": pl.Int64})
+    batches = list(
+        _iter_sequence_batches(
+            frame,
+            max_length=max_length,
+            min_length=min_length,
+            batch_rows=DEFAULT_SEQUENCE_BATCH_ROWS,
+        )
+    )
+    if not batches:
+        return _empty_sequences_frame()
+    return pl.concat(batches, rechunk=False)
+
+
+def write_user_sequences(
+    frame: pl.DataFrame,
+    *,
+    max_length: int,
+    min_length: int = 2,
+    output_path: str | Path,
+    batch_rows: int = DEFAULT_SEQUENCE_BATCH_ROWS,
+) -> None:
+    target = Path(output_path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+
+    writer: pq.ParquetWriter | None = None
+    try:
+        for batch in _iter_sequence_batches(
+            frame,
+            max_length=max_length,
+            min_length=min_length,
+            batch_rows=batch_rows,
+        ):
+            table = batch.to_arrow()
+            if writer is None:
+                writer = pq.ParquetWriter(target, table.schema, compression="zstd")
+            writer.write_table(table)
+    finally:
+        if writer is not None:
+            writer.close()
+
+    if writer is None:
+        _empty_sequences_frame().write_parquet(target)
 
 
 def build_seen_item_index(frame: pl.DataFrame) -> dict[int, set[int]]:
@@ -78,3 +112,46 @@ def histories_to_training_examples(
             }
         )
     return rows
+
+
+def _iter_sequence_batches(
+    frame: pl.DataFrame,
+    *,
+    max_length: int,
+    min_length: int,
+    batch_rows: int,
+) -> Iterator[pl.DataFrame]:
+    grouped = (
+        frame.group_by("user_id", maintain_order=True)
+        .agg(
+            pl.col("item_id"),
+            pl.col("timestamp"),
+        )
+        .sort("user_id")
+    )
+
+    batch: list[tuple[int, list[int], int, int]] = []
+    for row in grouped.iter_rows(named=True):
+        user_id = int(row["user_id"])
+        item_ids = [int(item_id) for item_id in row["item_id"]]
+        timestamps = [int(timestamp) for timestamp in row["timestamp"]]
+        for index in range(min_length, len(item_ids)):
+            history_start = max(0, index - max_length)
+            batch.append(
+                (
+                    user_id,
+                    item_ids[history_start:index],
+                    item_ids[index],
+                    timestamps[index],
+                )
+            )
+            if len(batch) >= batch_rows:
+                yield pl.DataFrame(batch, schema=SEQUENCE_SCHEMA, orient="row")
+                batch = []
+
+    if batch:
+        yield pl.DataFrame(batch, schema=SEQUENCE_SCHEMA, orient="row")
+
+
+def _empty_sequences_frame() -> pl.DataFrame:
+    return pl.DataFrame(schema=SEQUENCE_SCHEMA)

@@ -1,6 +1,6 @@
 # recsys-gen
 
-`recsys-gen` is an open recommender-system benchmark scaffold for large-scale interaction datasets such as Yambda. The current implementation focuses on the v0.1 research core: reproducible dataset preparation, temporal splits, negative sampling, baseline recommenders, SASRec, offline ranking metrics, and MLflow/DVC experiment wiring.
+`recsys-gen` is an open recommender-system benchmark scaffold for large-scale interaction datasets such as Yambda, MovieLens, Amazon Reviews, and Yelp. The current implementation focuses on the v0.1 research core: reproducible dataset acquisition, normalization, temporal splits, negative sampling, baseline recommenders, SASRec, offline ranking metrics, and MLflow/DVC experiment wiring.
 
 ## Project layout
 
@@ -18,7 +18,7 @@
 
 ## v0.1 scope
 
-- Canonical interaction schema normalization
+- Acquisition and canonical interaction schema normalization
 - Temporal train/validation/test splitting
 - Sequence building and negative sampling
 - `ItemKNN`, matrix factorization, and `SASRec`
@@ -30,19 +30,39 @@
 ```bash
 make requirements
 make test
+uv run python -m recsys_gen.training.acquire --config configs/acquire_movielens25m.yaml
+uv run python -m recsys_gen.training.prepare --config configs/dataset_movielens25m.yaml
 uv run python -m recsys_gen.training.train --config configs/sasrec_yambda.yaml
 ```
 
 ## Dataset assumptions
 
-The repo does not vendor Yambda. Point configs at local parquet files with interaction columns that can be mapped into the canonical schema:
+The repo does not vendor large public datasets. Acquisition configs materialize source files into `data/external/<dataset>/` and normalized parquet files into `data/raw/`.
+
+Canonical interaction columns are:
 
 - `user_id`
 - `item_id`
 - `timestamp`
 - `target`
 - `event_type`
-- optional `item_embedding`
+
+Additional item metadata is materialized into parallel `*_items.parquet` files for future generative recommenders.
+
+## Supported acquisition targets
+
+- `movielens25m`: automatic download from GroupLens and normalization into ratings plus movie metadata parquet files
+- `amazon_electronics`, `amazon_beauty`, `amazon_sports`: manual placement of Amazon Reviews'23 review and metadata files, then normalization into parquet
+- `yelp`: manual placement of the Yelp Open Dataset review and business files, then normalization into parquet
+
+## Worktree workflow
+
+Use a separate worktree for dataset-ingestion work so large-data plumbing does not interfere with the main checkout:
+
+```bash
+git worktree add -b feat-dataset-ingestion-core3 /tmp/ml-playground-datasets main
+cd /tmp/ml-playground-datasets
+```
 
 ## Next milestones
 

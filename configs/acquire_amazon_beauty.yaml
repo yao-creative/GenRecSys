@@ -1,0 +1,36 @@
+dataset:
+  name: amazon_beauty
+  normalizer: generic
+  external_dir: data/external/amazon_beauty
+  raw_interactions_path: data/raw/amazon_beauty_interactions.parquet
+  raw_items_path: data/raw/amazon_beauty_items.parquet
+  download:
+    mode: manual
+    manual_instructions: >-
+      Download the Amazon Reviews'23 Beauty review and metadata files from the
+      official release, place them under data/external/amazon_beauty/, and keep
+      the filenames below.
+  sources:
+    reviews: Beauty.csv.gz
+    meta: meta_Beauty.jsonl.gz
+  normalization:
+    interactions:
+      source: reviews
+      user_id: user_id
+      item_id: parent_asin
+      timestamp: timestamp
+      event_type: review
+      extra_columns:
+        - rating
+        - verified_purchase
+    items:
+      source: meta
+      item_id: parent_asin
+      extra_columns:
+        title: title
+        main_category: main_category
+        categories: categories
+        average_rating: average_rating
+        rating_number: rating_number
+        store: store
+        price: price

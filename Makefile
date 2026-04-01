@@ -24,6 +24,46 @@ test:
 train-baseline:
 	$(PYTHON) -m recsys_gen.training.train --config configs/itemknn_yambda.yaml
 
+.PHONY: acquire-movielens25m
+acquire-movielens25m:
+	$(PYTHON) -m recsys_gen.training.acquire --config configs/acquire_movielens25m.yaml
+
+.PHONY: acquire-amazon-electronics
+acquire-amazon-electronics:
+	$(PYTHON) -m recsys_gen.training.acquire --config configs/acquire_amazon_electronics.yaml
+
+.PHONY: acquire-amazon-beauty
+acquire-amazon-beauty:
+	$(PYTHON) -m recsys_gen.training.acquire --config configs/acquire_amazon_beauty.yaml
+
+.PHONY: acquire-amazon-sports
+acquire-amazon-sports:
+	$(PYTHON) -m recsys_gen.training.acquire --config configs/acquire_amazon_sports.yaml
+
+.PHONY: acquire-yelp
+acquire-yelp:
+	$(PYTHON) -m recsys_gen.training.acquire --config configs/acquire_yelp.yaml
+
+.PHONY: prepare-movielens25m
+prepare-movielens25m:
+	$(PYTHON) -m recsys_gen.training.prepare --config configs/dataset_movielens25m.yaml
+
+.PHONY: prepare-amazon-electronics
+prepare-amazon-electronics:
+	$(PYTHON) -m recsys_gen.training.prepare --config configs/dataset_amazon_electronics.yaml
+
+.PHONY: prepare-amazon-beauty
+prepare-amazon-beauty:
+	$(PYTHON) -m recsys_gen.training.prepare --config configs/dataset_amazon_beauty.yaml
+
+.PHONY: prepare-amazon-sports
+prepare-amazon-sports:
+	$(PYTHON) -m recsys_gen.training.prepare --config configs/dataset_amazon_sports.yaml
+
+.PHONY: prepare-yelp
+prepare-yelp:
+	$(PYTHON) -m recsys_gen.training.prepare --config configs/dataset_yelp.yaml
+
 .PHONY: train-sasrec
 train-sasrec:
 	$(PYTHON) -m recsys_gen.training.train --config configs/sasrec_yambda.yaml
