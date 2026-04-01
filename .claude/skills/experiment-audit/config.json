@@ -1,0 +1,6 @@
+{
+  "name": "experiment-audit",
+  "description": "Experiment audit skill for validating experimental design and rigor",
+  "invocable": true,
+  "triggers": []
+}

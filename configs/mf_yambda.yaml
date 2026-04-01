@@ -1,0 +1,14 @@
+dataset:
+  prepared_dir: data/processed/yambda
+model:
+  name: mf
+  embedding_dim: 64
+  learning_rate: 0.01
+  epochs: 3
+  batch_size: 256
+evaluation:
+  cutoffs: [10, 20]
+tracking:
+  experiment_name: recsys-gen
+  run_name: mf-yambda
+  artifact_dir: data/models/mf

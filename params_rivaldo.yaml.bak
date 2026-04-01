@@ -1,0 +1,38 @@
+# V4 pipeline parameters
+username: rivaldo.philip
+file_prefix: rivaldo
+date: 03-06-2026
+input_csv: data/raw/rivaldo-philip-03-06-2026-llm-forensic-v4.csv
+v4_column: llm_forensic_analysis_raw_v4
+version: v1
+embedding_model: all-MiniLM-L6-v2
+label_method: bertopic
+representation_method: mmr
+series_usernames: rivaldo.philip
+combine_creator: false
+semantic_categorical_path: data/processed/03-06-2026/rivaldo.philip_v4_categorical_string_features_id.parquet
+semantic_metrics_log_path: data/processed/03-06-2026/rivaldo.philip_v4_metric_lognormal_id.parquet
+sparse_features_dir: data/features/semantic/03-06-2026/rivaldo.philip
+sparse_metrics_log_path: data/processed/03-06-2026/rivaldo.philip_v4_metric_lognormal_id.parquet
+sparse_boolean_path: data/processed/03-06-2026/rivaldo.philip_v4_boolean_features_id.parquet
+forensic_categorical_path: data/processed/03-06-2026/rivaldo.philip_v4_categorical_string_features_id.parquet
+forensic_metrics_path: data/processed/03-06-2026/rivaldo.philip_v4_metric_lognormal_id.parquet
+forensic_numeric_path: data/processed/03-06-2026/rivaldo.philip_v4_numeric_features_id.parquet
+forensic_boolean_path: data/processed/03-06-2026/rivaldo.philip_v4_boolean_features_id.parquet
+double_lasso_parallel: true
+double_lasso_n_jobs: null
+double_lasso_max_cpu_fraction: 0.75
+sparse_double_lasso_parallel: true
+sparse_double_lasso_n_jobs: null
+sparse_double_lasso_max_cpu_fraction: 0.75
+
+# Forensic pipeline parameters
+labels_col: v4_semantic_topic_labels
+forensic_version: v2
+forensic_control_exclusions: likes,reach,saved,shares,total_interactions,views,engagement_rate,comments,comment_count,is_comment_enabled,is_shared_to_feed,avg_watch_time,video_view_total_time,profile_visits,ts_doy_*,v*_audio_vocal_characteristics_scores,v*_audio_audio_layers_scores,v*_audio_music_recognition_confidence,v*_audio_music_bpm,v*_audio_music_genre_scores,v*_audio_music_subgenre_scores,v*_audio_music_mood_scores,v*_audio_music_instrumentation_scores,v*_audio_music_vocal_style_scores,v*_audio_music_lyrics_themes_scores,v*_audio_music_is_original_audio,v*_audio_music_present,v*_audio_music_vocals_present,v*_audio_music_explicit_lyrics,v*_creative_analysis_virality_markers_remix_potential_audio_extractable,v*_confidence_*
+sparse_control_exclusions: is_shared_to_feed
+sparse_min_treatment_count: 15
+sparse_label_cols: v4_audience_signals_age_indicators_labels,v4_audience_signals_cultural_references_labels,v4_audience_signals_knowledge_assumptions_labels,v4_audience_signals_production_style_indicators_labels,v4_content_mechanics_credibility_markers_labels,v4_content_mechanics_cta_types_labels,v4_content_mechanics_emotional_appeals_labels,v4_content_mechanics_hook_type_labels,v4_semantic_genre_labels,v4_semantic_intent_labels,v4_semantic_topic_labels
+run_comparison: true
+run_visualizations: true
+run_deep_dive: false

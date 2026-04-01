@@ -1,0 +1,43 @@
+name: Claude Code Review
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+on:
+  # Auto-review on PR open/update
+  pull_request:
+    types: [opened, synchronize]
+  # Respond to @claude mentions
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  claude-review:
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+      CLAUDE_CODE_USE_BEDROCK: "1"
+      AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.CLAUDE_REVIEW_AWS_BEARER_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Claude Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          use_bedrock: "true"
+          direct_prompt: |
+            Review this PR. Focus on: correctness bugs, behavioral regressions,
+            security issues, and missing tests. Be concise.
+          claude_args: '--model us.anthropic.claude-sonnet-4-6 --max-turns 10'

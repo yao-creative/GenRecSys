@@ -1,0 +1,44 @@
+stages:
+  prepare_yambda:
+    cmd: >-
+      uv run python -m recsys_gen.training.prepare --config configs/dataset_yambda.yaml
+    deps:
+      - configs/dataset_yambda.yaml
+      - src/recsys_gen/data/dataset.py
+      - src/recsys_gen/data/schemas.py
+      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/training/prepare.py
+    outs:
+      - data/processed/yambda/train.parquet
+      - data/processed/yambda/validation.parquet
+      - data/processed/yambda/test.parquet
+      - data/processed/yambda/sequences.parquet
+
+  train_itemknn:
+    cmd: >-
+      uv run python -m recsys_gen.training.train --config configs/itemknn_yambda.yaml
+    deps:
+      - configs/itemknn_yambda.yaml
+      - data/processed/yambda/train.parquet
+      - data/processed/yambda/validation.parquet
+      - src/recsys_gen/models/baselines.py
+      - src/recsys_gen/evaluation/metrics.py
+      - src/recsys_gen/training/train.py
+      - src/recsys_gen/tracking/mlflow.py
+    outs:
+      - data/models/itemknn
+
+  train_sasrec:
+    cmd: >-
+      uv run python -m recsys_gen.training.train --config configs/sasrec_yambda.yaml
+    deps:
+      - configs/sasrec_yambda.yaml
+      - data/processed/yambda/train.parquet
+      - data/processed/yambda/validation.parquet
+      - data/processed/yambda/sequences.parquet
+      - src/recsys_gen/models/sasrec.py
+      - src/recsys_gen/evaluation/metrics.py
+      - src/recsys_gen/training/train.py
+      - src/recsys_gen/tracking/mlflow.py
+    outs:
+      - data/models/sasrec

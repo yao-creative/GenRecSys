@@ -1,0 +1,18 @@
+dataset:
+  prepared_dir: data/processed/yambda
+model:
+  name: sasrec
+  max_sequence_length: 50
+  hidden_dim: 64
+  num_heads: 2
+  num_blocks: 2
+  dropout: 0.1
+  learning_rate: 0.001
+  batch_size: 128
+  epochs: 2
+evaluation:
+  cutoffs: [10, 20]
+tracking:
+  experiment_name: recsys-gen
+  run_name: sasrec-yambda
+  artifact_dir: data/models/sasrec

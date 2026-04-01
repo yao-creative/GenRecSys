@@ -1,0 +1,32 @@
+.git
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# IDE / OS
+.vscode
+.idea
+.DS_Store
+
+# Local data and artifacts (mounted via volumes instead)
+data/
+mlartifacts/
+default-artifact-root/
+
+# Notebooks and reports (not needed in image)
+notebooks/
+reports/
+
+# Supabase local metadata
+supabase/.temp
+supabase/.branches
+
+# Env files and secrets
+.env
+.env.*
+docker/.env
+
+# Misc
+*.log

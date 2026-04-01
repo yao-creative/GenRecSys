@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/app.Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5001
+    depends_on:
+      - mlflow
+    volumes:
+      - ../data:/app/data
+      - ../mlartifacts:/app/mlartifacts
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    env_file:
+      - .env
+    command: >-
+      mlflow server
+      --backend-store-uri postgresql+psycopg2://${SUPABASE_USER}:${SUPABASE_PASSWORD}@${SUPABASE_HOST}:${SUPABASE_PORT}/${SUPABASE_DB_NAME}
+      --default-artifact-root wasbs://${AZURE_BLOB_CONTAINER}@${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net
+      --host 0.0.0.0
+      --port 5001
+    ports:
+      - "5001:5001"
+    volumes:
+      - ../mlartifacts:/mlartifacts

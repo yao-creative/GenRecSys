@@ -1,0 +1,6 @@
+{
+  "name": "stat-interpretation",
+  "description": "Creator-facing performance analyst translating statistical model outputs into actionable insights for content creators",
+  "invocable": true,
+  "triggers": []
+}

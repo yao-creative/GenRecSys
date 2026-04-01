@@ -1,0 +1,57 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "recsys-gen"
+version = "0.1.0"
+description = "Open research-grade recommender system benchmark for large-scale interaction datasets."
+authors = [
+  { name = "lema" },
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "dvc>=3.0.0",
+    "faiss-cpu>=1.8.0",
+    "fastapi>=0.115.0",
+    "loguru",
+    "mlflow>=2.17.0",
+    "numpy",
+    "pandas",
+    "polars>=1.8.0",
+    "pyarrow>=17.0.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.5.0",
+    "python-dotenv",
+    "pyyaml>=6.0.2",
+    "scikit-learn",
+    "torch>=2.4.0",
+    "typer>=0.12.5",
+    "uvicorn>=0.30.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "ruff>=0.6.0",
+]
+
+[tool.flit.module]
+name = "recsys_gen"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+include = ["pyproject.toml", "src/**/*.py", "tests/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["recsys_gen"]
+force-sort-within-sections = true

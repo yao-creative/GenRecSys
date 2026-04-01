@@ -1,0 +1,6 @@
+{
+  "name": "model-engineering",
+  "description": "Statistical Rigour Audit for Sparse DML Pipeline",
+  "invocable": true,
+  "triggers": []
+}
