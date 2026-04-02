@@ -1,0 +1,18 @@
+dataset:
+  prepared_dir: data/processed/yambda
+model:
+  name: torchrec_two_tower
+  max_history_length: 50
+  embedding_dim: 64
+  query_hidden_dim: 128
+  item_hidden_dim: 128
+training:
+  batch_size: 128
+  learning_rate: 0.001
+  epochs: 2
+evaluation:
+  cutoffs: [10, 20]
+tracking:
+  experiment_name: recsys-gen
+  run_name: torchrec-yambda
+  artifact_dir: data/models/torchrec_yambda

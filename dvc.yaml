@@ -64,15 +64,24 @@ stages:
       uv run python -m recsys_gen.training.prepare --config configs/dataset_yambda.yaml
     deps:
       - configs/dataset_yambda.yaml
+      - data/raw/yambda_interactions.parquet
       - src/recsys_gen/data/dataset.py
+      - src/recsys_gen/data/retrieval.py
       - src/recsys_gen/data/schemas.py
-      - src/recsys_gen/data/sequences.py
       - src/recsys_gen/training/prepare.py
     outs:
       - data/processed/yambda/train.parquet
       - data/processed/yambda/validation.parquet
       - data/processed/yambda/test.parquet
-      - data/processed/yambda/sequences.parquet
+      - data/processed/yambda/user_vocab.parquet
+      - data/processed/yambda/item_vocab.parquet
+      - data/processed/yambda/train_encoded.parquet
+      - data/processed/yambda/validation_encoded.parquet
+      - data/processed/yambda/test_encoded.parquet
+      - data/processed/yambda/retrieval_train.parquet
+      - data/processed/yambda/retrieval_validation.parquet
+      - data/processed/yambda/retrieval_test.parquet
+      - data/processed/yambda/seen_train.parquet
 
   prepare_movielens25m:
     cmd: >-
@@ -82,13 +91,21 @@ stages:
       - data/raw/movielens25m_interactions.parquet
       - src/recsys_gen/data/dataset.py
       - src/recsys_gen/data/schemas.py
-      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/data/retrieval.py
       - src/recsys_gen/training/prepare.py
     outs:
       - data/processed/movielens25m/train.parquet
       - data/processed/movielens25m/validation.parquet
       - data/processed/movielens25m/test.parquet
-      - data/processed/movielens25m/sequences.parquet
+      - data/processed/movielens25m/user_vocab.parquet
+      - data/processed/movielens25m/item_vocab.parquet
+      - data/processed/movielens25m/train_encoded.parquet
+      - data/processed/movielens25m/validation_encoded.parquet
+      - data/processed/movielens25m/test_encoded.parquet
+      - data/processed/movielens25m/retrieval_train.parquet
+      - data/processed/movielens25m/retrieval_validation.parquet
+      - data/processed/movielens25m/retrieval_test.parquet
+      - data/processed/movielens25m/seen_train.parquet
 
   prepare_amazon_electronics:
     cmd: >-
@@ -98,13 +115,21 @@ stages:
       - data/raw/amazon_electronics_interactions.parquet
       - src/recsys_gen/data/dataset.py
       - src/recsys_gen/data/schemas.py
-      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/data/retrieval.py
       - src/recsys_gen/training/prepare.py
     outs:
       - data/processed/amazon_electronics/train.parquet
       - data/processed/amazon_electronics/validation.parquet
       - data/processed/amazon_electronics/test.parquet
-      - data/processed/amazon_electronics/sequences.parquet
+      - data/processed/amazon_electronics/user_vocab.parquet
+      - data/processed/amazon_electronics/item_vocab.parquet
+      - data/processed/amazon_electronics/train_encoded.parquet
+      - data/processed/amazon_electronics/validation_encoded.parquet
+      - data/processed/amazon_electronics/test_encoded.parquet
+      - data/processed/amazon_electronics/retrieval_train.parquet
+      - data/processed/amazon_electronics/retrieval_validation.parquet
+      - data/processed/amazon_electronics/retrieval_test.parquet
+      - data/processed/amazon_electronics/seen_train.parquet
 
   prepare_amazon_beauty:
     cmd: >-
@@ -114,13 +139,21 @@ stages:
       - data/raw/amazon_beauty_interactions.parquet
       - src/recsys_gen/data/dataset.py
       - src/recsys_gen/data/schemas.py
-      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/data/retrieval.py
       - src/recsys_gen/training/prepare.py
     outs:
       - data/processed/amazon_beauty/train.parquet
       - data/processed/amazon_beauty/validation.parquet
       - data/processed/amazon_beauty/test.parquet
-      - data/processed/amazon_beauty/sequences.parquet
+      - data/processed/amazon_beauty/user_vocab.parquet
+      - data/processed/amazon_beauty/item_vocab.parquet
+      - data/processed/amazon_beauty/train_encoded.parquet
+      - data/processed/amazon_beauty/validation_encoded.parquet
+      - data/processed/amazon_beauty/test_encoded.parquet
+      - data/processed/amazon_beauty/retrieval_train.parquet
+      - data/processed/amazon_beauty/retrieval_validation.parquet
+      - data/processed/amazon_beauty/retrieval_test.parquet
+      - data/processed/amazon_beauty/seen_train.parquet
 
   prepare_amazon_sports:
     cmd: >-
@@ -130,13 +163,21 @@ stages:
       - data/raw/amazon_sports_interactions.parquet
       - src/recsys_gen/data/dataset.py
       - src/recsys_gen/data/schemas.py
-      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/data/retrieval.py
       - src/recsys_gen/training/prepare.py
     outs:
       - data/processed/amazon_sports/train.parquet
       - data/processed/amazon_sports/validation.parquet
       - data/processed/amazon_sports/test.parquet
-      - data/processed/amazon_sports/sequences.parquet
+      - data/processed/amazon_sports/user_vocab.parquet
+      - data/processed/amazon_sports/item_vocab.parquet
+      - data/processed/amazon_sports/train_encoded.parquet
+      - data/processed/amazon_sports/validation_encoded.parquet
+      - data/processed/amazon_sports/test_encoded.parquet
+      - data/processed/amazon_sports/retrieval_train.parquet
+      - data/processed/amazon_sports/retrieval_validation.parquet
+      - data/processed/amazon_sports/retrieval_test.parquet
+      - data/processed/amazon_sports/seen_train.parquet
 
   prepare_yelp:
     cmd: >-
@@ -146,39 +187,53 @@ stages:
       - data/raw/yelp_interactions.parquet
       - src/recsys_gen/data/dataset.py
       - src/recsys_gen/data/schemas.py
-      - src/recsys_gen/data/sequences.py
+      - src/recsys_gen/data/retrieval.py
       - src/recsys_gen/training/prepare.py
     outs:
       - data/processed/yelp/train.parquet
       - data/processed/yelp/validation.parquet
       - data/processed/yelp/test.parquet
-      - data/processed/yelp/sequences.parquet
+      - data/processed/yelp/user_vocab.parquet
+      - data/processed/yelp/item_vocab.parquet
+      - data/processed/yelp/train_encoded.parquet
+      - data/processed/yelp/validation_encoded.parquet
+      - data/processed/yelp/test_encoded.parquet
+      - data/processed/yelp/retrieval_train.parquet
+      - data/processed/yelp/retrieval_validation.parquet
+      - data/processed/yelp/retrieval_test.parquet
+      - data/processed/yelp/seen_train.parquet
 
-  train_itemknn:
+  train_torchrec_yambda:
     cmd: >-
-      uv run python -m recsys_gen.training.train --config configs/itemknn_yambda.yaml
+      uv run python -m recsys_gen.training.train_torchrec --config configs/torchrec_yambda.yaml
     deps:
-      - configs/itemknn_yambda.yaml
-      - data/processed/yambda/train.parquet
-      - data/processed/yambda/validation.parquet
-      - src/recsys_gen/models/baselines.py
+      - configs/torchrec_yambda.yaml
+      - data/processed/yambda/retrieval_train.parquet
+      - data/processed/yambda/train_encoded.parquet
+      - data/processed/yambda/item_vocab.parquet
+      - data/processed/yambda/user_vocab.parquet
+      - src/recsys_gen/data/retrieval.py
+      - src/recsys_gen/models/torchrec_two_tower.py
+      - src/recsys_gen/training/train_torchrec.py
+    outs:
+      - data/models/torchrec_yambda/model.pt
+      - data/models/torchrec_yambda/item_embeddings.pt
+      - data/models/torchrec_yambda/model_metadata.json
+
+  eval_torchrec_yambda:
+    cmd: >-
+      uv run python -m recsys_gen.training.eval_torchrec --config configs/torchrec_yambda.yaml
+    deps:
+      - configs/torchrec_yambda.yaml
+      - data/processed/yambda/retrieval_validation.parquet
+      - data/processed/yambda/seen_train.parquet
+      - data/processed/yambda/item_vocab.parquet
+      - data/processed/yambda/user_vocab.parquet
+      - data/models/torchrec_yambda/model.pt
+      - data/models/torchrec_yambda/item_embeddings.pt
       - src/recsys_gen/evaluation/metrics.py
-      - src/recsys_gen/training/train.py
+      - src/recsys_gen/models/torchrec_two_tower.py
+      - src/recsys_gen/training/eval_torchrec.py
       - src/recsys_gen/tracking/mlflow.py
     outs:
-      - data/models/itemknn
-
-  train_sasrec:
-    cmd: >-
-      uv run python -m recsys_gen.training.train --config configs/sasrec_yambda.yaml
-    deps:
-      - configs/sasrec_yambda.yaml
-      - data/processed/yambda/train.parquet
-      - data/processed/yambda/validation.parquet
-      - data/processed/yambda/sequences.parquet
-      - src/recsys_gen/models/sasrec.py
-      - src/recsys_gen/evaluation/metrics.py
-      - src/recsys_gen/training/train.py
-      - src/recsys_gen/tracking/mlflow.py
-    outs:
-      - data/models/sasrec
+      - data/models/torchrec_yambda/metrics.json

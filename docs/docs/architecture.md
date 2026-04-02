@@ -1,131 +1,29 @@
 # Architecture Compute Graph
 
-This graph traces the executable entry points into the package and the major compute/data dependencies they activate.
+The repo now has a single recommender path: split-safe retrieval prep feeding a TorchRec-oriented two-tower trainer and offline evaluator.
 
-```mermaid
-flowchart TD
-    subgraph EntryPoints[Entry Points]
-        DVC["dvc.yaml stages"]
-        ACQ["python -m recsys_gen.training.acquire"]
-        PREP["python -m recsys_gen.training.prepare"]
-        TRAIN["python -m recsys_gen.training.train"]
-        API["recsys_gen.serving.api:app"]
-        BOOT["scripts/bootstrap_sample_data.py"]
-        MAKE["Makefile targets"]
-    end
+## Pipeline
 
-    subgraph ConfigAndIO[Config and IO]
-        YAML["configs/*.yaml"]
-        IO["utils.io<br/>load_yaml / ensure_dir"]
-        CFG["config.get_settings"]
-        EXT["data/external/*"]
-        RAW["data/raw/*.parquet"]
-        PROC["data/processed/yambda/*.parquet"]
-        MODELART["data/models/*"]
-        MLFLOW["MLflow tracking store"]
-    end
+1. `training.acquire` downloads or validates source datasets and normalizes them into raw parquet tables.
+2. `training.prepare` converts raw interactions into canonical train/validation/test splits, contiguous ID vocabularies, encoded splits, retrieval examples, and seen-item masks.
+3. `training.train_torchrec` trains a two-tower retriever and writes checkpoints plus item embedding artifacts.
+4. `training.eval_torchrec` scores the full catalog offline, logs ranking metrics to MLflow, and writes `metrics.json`.
+5. `serving.api` remains isolated and only exposes a health endpoint.
 
-    subgraph DataLayer[Data Layer]
-        ACQDATA["data.acquisition<br/>download / extract / normalize"]
-        DATASET["data.dataset<br/>load / normalize / filter / temporal split"]
-        SEQ["data.sequences<br/>build_user_sequences / negatives / examples"]
-        SCHEMA["data.schemas"]
-    end
+## Data contract
 
-    subgraph ModelLayer[Model Layer]
-        BASE["models.baselines<br/>ItemKNN / MF"]
-        SAS["models.sasrec<br/>SASRec / Trainer"]
-    end
+`prepare` now writes:
 
-    subgraph EvalLayer[Evaluation]
-        METRICS["evaluation.metrics<br/>Recall / NDCG / MRR / HitRate / Coverage / Diversity"]
-    end
+- `train.parquet`, `validation.parquet`, `test.parquet`
+- `user_vocab.parquet`, `item_vocab.parquet`
+- `train_encoded.parquet`, `validation_encoded.parquet`, `test_encoded.parquet`
+- `retrieval_train.parquet`, `retrieval_validation.parquet`, `retrieval_test.parquet`
+- `seen_train.parquet`
 
-    subgraph ServingLayer[Serving]
-        HEALTH["GET /health"]
-    end
+The important invariant is that evaluation examples are built from prefix histories only:
 
-    MAKE --> PREP
-    MAKE --> TRAIN
-    MAKE --> DVC
+- retrieval train uses train history only
+- retrieval validation uses train history only
+- retrieval test uses train plus validation history only
 
-    DVC --> PREP
-    DVC --> TRAIN
-
-    BOOT --> RAW
-
-    ACQ --> YAML
-    ACQ --> IO
-    ACQ --> ACQDATA
-    ACQ --> EXT
-    ACQ --> RAW
-
-    PREP --> YAML
-    PREP --> IO
-    PREP --> DATASET
-    PREP --> SEQ
-    PREP --> RAW
-    PREP --> PROC
-    ACQDATA --> SCHEMA
-    DATASET --> SCHEMA
-
-    TRAIN --> YAML
-    TRAIN --> IO
-    TRAIN --> PROC
-    TRAIN --> BASE
-    TRAIN --> SAS
-    TRAIN --> SEQ
-    TRAIN --> METRICS
-    TRAIN --> CFG
-    TRAIN --> MLFLOW
-    TRAIN --> MODELART
-
-    API --> HEALTH
-```
-
-## Read the graph as a compute pipeline
-
-The main architecture is not request-driven yet. It is batch-driven:
-
-1. `bootstrap_sample_data.py` can synthesize raw parquet input.
-2. `training.acquire` downloads or validates source datasets and normalizes them into raw parquet tables.
-3. `training.prepare` converts raw interactions into normalized splits and sequence tables.
-4. `training.train` loads prepared artifacts, trains either baseline or sequential models, evaluates them, and writes artifacts plus MLflow logs.
-5. `serving.api` is currently isolated from the training stack and only exposes a health endpoint.
-
-## Mathematical shape of the compute graph
-
-At a coarse level, the system is a composition
-
-```text
-F = T ∘ P ∘ A ∘ B
-```
-
-where:
-
-- `B` maps local raw inputs into a parquet interaction table
-- `A` maps external source files into normalized parquet interaction and item tables
-- `P` maps the interaction table into prepared artifacts `{train, val, test, sequences}`
-- `T` maps prepared artifacts into `{model artifacts, metrics, MLflow run}`
-
-More explicitly:
-
-```text
-B: ∅ -> X_bootstrap
-A: X_external -> (X_raw, I_raw)
-P: X_raw -> (X_train, X_val, X_test, S)
-T: (X_train, X_val, S, θ) -> (M_θ, metrics, run_id)
-```
-
-with `θ` denoting the selected model configuration.
-
-Training then branches by model family:
-
-```text
-T(·) =
-  T_itemknn(·)   if θ.name = itemknn
-  T_mf(·)        if θ.name = mf
-  T_sasrec(·)    if θ.name = sasrec
-```
-
-The important architectural fact is that `prepare` is a shared upstream operator and `train` is a model-specific downstream operator. In graph terms, `prepare` has high out-degree into all training runs, while `serving.api` is currently disconnected from learned model artifacts.
+That keeps temporal comparability while removing future-history leakage from model training and offline evaluation.

@@ -1,6 +1,6 @@
 # recsys-gen
 
-`recsys-gen` is an open recommender-system benchmark scaffold for large-scale interaction datasets such as Yambda, MovieLens, Amazon Reviews, and Yelp. The current implementation focuses on the v0.1 research core: reproducible dataset acquisition, normalization, temporal splits, negative sampling, baseline recommenders, SASRec, offline ranking metrics, and MLflow/DVC experiment wiring.
+`recsys-gen` is an open recommender-system benchmark scaffold for large-scale interaction datasets such as Yambda, MovieLens, Amazon Reviews, and Yelp. The current implementation focuses on a TorchRec-oriented retrieval core: reproducible dataset acquisition, normalization, temporal splits, retrieval example generation, two-tower training, offline ranking metrics, and MLflow/DVC experiment wiring.
 
 ## Project layout
 
@@ -16,12 +16,12 @@
 └── dvc.yaml                # Reproducible benchmark pipeline
 ```
 
-## v0.1 scope
+## Current scope
 
 - Acquisition and canonical interaction schema normalization
 - Temporal train/validation/test splitting
-- Sequence building and negative sampling
-- `ItemKNN`, matrix factorization, and `SASRec`
+- Retrieval example generation with split-safe user histories
+- TorchRec-oriented two-tower retrieval training
 - `Recall@K`, `NDCG@K`, `MRR`, `HitRate`, `Coverage`, and `Diversity`
 - MLflow tracking and DVC stages
 
@@ -32,7 +32,8 @@ make requirements
 make test
 uv run python -m recsys_gen.training.acquire --config configs/acquire_movielens25m.yaml
 uv run python -m recsys_gen.training.prepare --config configs/dataset_movielens25m.yaml
-uv run python -m recsys_gen.training.train --config configs/sasrec_yambda.yaml
+uv run python -m recsys_gen.training.train_torchrec --config configs/torchrec_yambda.yaml
+uv run python -m recsys_gen.training.eval_torchrec --config configs/torchrec_yambda.yaml
 ```
 
 ## Dataset assumptions
@@ -47,7 +48,7 @@ Canonical interaction columns are:
 - `target`
 - `event_type`
 
-Additional item metadata is materialized into parallel `*_items.parquet` files for future generative recommenders.
+Additional item metadata is materialized into parallel `*_items.parquet` files for later hybrid retrieval/ranking work.
 
 ## Supported acquisition targets
 
@@ -66,5 +67,6 @@ cd /tmp/ml-playground-datasets
 
 ## Next milestones
 
-- v0.2: FAISS candidate retrieval and a minimal recommendation API
-- v0.3: Additional sequential and generative recommenders
+- Add hybrid item/context features on top of the current retrieval contract
+- Add ANN index build and online retrieval serving
+- Add a downstream ranking stage

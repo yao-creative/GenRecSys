@@ -17,8 +17,8 @@ def test_dvc_stages_exist() -> None:
     assert "prepare_amazon_beauty" in stages
     assert "prepare_amazon_sports" in stages
     assert "prepare_yelp" in stages
-    assert "train_itemknn" in stages
-    assert "train_sasrec" in stages
+    assert "train_torchrec_yambda" in stages
+    assert "eval_torchrec_yambda" in stages
 
 
 def test_configs_target_new_package() -> None:
@@ -27,7 +27,8 @@ def test_configs_target_new_package() -> None:
     assert "lema_ml" not in readme
 
 
-def test_dataset_configs_include_item_metadata_paths() -> None:
+def test_dataset_configs_include_item_sidecar_paths() -> None:
     for path in Path("configs").glob("dataset_*.yaml"):
         config = yaml.safe_load(path.read_text(encoding="utf-8"))
-        assert "item_metadata_path" in config["dataset"]
+        dataset_config = config["dataset"]
+        assert "item_metadata_path" in dataset_config or "item_embeddings_path" in dataset_config

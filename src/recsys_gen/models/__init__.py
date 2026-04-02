@@ -1,4 +1,3 @@
-from recsys_gen.models.baselines import ItemKNNRecommender, MatrixFactorizationRecommender
-from recsys_gen.models.sasrec import SASRec, SASRecTrainer
+from recsys_gen.models.torchrec_two_tower import TORCHREC_AVAILABLE, TorchRecArtifactBundle, TwoTowerRetrievalModel
 
-__all__ = ["ItemKNNRecommender", "MatrixFactorizationRecommender", "SASRec", "SASRecTrainer"]
+__all__ = ["TORCHREC_AVAILABLE", "TorchRecArtifactBundle", "TwoTowerRetrievalModel"]
