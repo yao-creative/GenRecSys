@@ -1,4 +1,5 @@
 site_name: recsys-gen
 nav:
   - Overview: index.md
+  - Datasets: datasets.md
   - Architecture: architecture.md
